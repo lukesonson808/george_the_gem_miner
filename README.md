@@ -77,10 +77,24 @@ npm run tunnel
 
 ### 4. Configure A1Zap
 
-1. Go to A1Zap dashboard
-2. Create/edit agent
-3. Set webhook: `https://your-tunnel.loca.lt/webhook/gem-miner`
-4. Test: "Hey Georgie, show me easy CS classes!"
+#### Option A: Local Development (using tunnel)
+
+1. Start local tunnel: `npm run tunnel`
+2. Copy the tunnel URL (e.g., `https://your-tunnel.loca.lt`)
+3. Go to A1Zap dashboard → Create/edit agent
+4. Set webhook: `https://your-tunnel.loca.lt/webhook/gem-miner`
+5. Test: "Hey Georgie, show me easy CS classes!"
+
+#### Option B: Production Deployment (Railway - 24/7)
+
+For 24/7 deployment, see **[RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)** for complete instructions.
+
+**Quick steps:**
+1. Deploy to Railway (connects to GitHub automatically)
+2. Set environment variables in Railway dashboard
+3. Get your Railway URL (e.g., `https://your-app.up.railway.app`)
+4. Configure A1Zap webhook: `https://your-app.up.railway.app/webhook/gem-miner`
+5. Your agent runs 24/7! 🚀
 
 ## 💬 Example Queries
 
