@@ -1,0 +1,611 @@
+[
+  {
+    "courseId": "MBB 980H",
+    "title": "What Disease Teaches about Cognition",
+    "rating": null,
+    "workloadHrs": 3.36,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PSY 18",
+    "title": "Psychopathology",
+    "rating": null,
+    "workloadHrs": 4.34,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "AFRAMER 119X",
+    "title": "Chocolate, Culture, and the Politics of Food",
+    "rating": null,
+    "workloadHrs": 3.25,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PSCI 133",
+    "title": "Atmospheric Chemistry",
+    "rating": null,
+    "workloadHrs": 6.22,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ENGLISH 185E",
+    "title": "The Essay: History and Practice",
+    "rating": null,
+    "workloadHrs": 4.03,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HEB 145",
+    "title": "Thinking Through Human Cognition",
+    "rating": null,
+    "workloadHrs": 2.76,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HAA 279P",
+    "title": "The Object in the Art Museum",
+    "rating": null,
+    "workloadHrs": 3.25,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "SLAVIC 97",
+    "title": "Introduction to Slavic Literatures and Cultures",
+    "rating": null,
+    "workloadHrs": 5.6,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "AFVS 152F",
+    "title": "The Bolex: Working in Film",
+    "rating": null,
+    "workloadHrs": 7.63,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "RELIGION 33",
+    "title": "Indigenous Pacific Islander Wellbeing and Spirituality",
+    "rating": null,
+    "workloadHrs": 4.78,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "SCRB 135",
+    "title": "Reproductive Biology",
+    "rating": null,
+    "workloadHrs": 4.33,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FYSEMR 24U",
+    "title": "“How Did I Get Here?”—Appreciating “Normal” Child Development",
+    "rating": null,
+    "workloadHrs": 1.22,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ESPP 90S",
+    "title": "The Technology, Economics, and Public Policy of Renewable Energy",
+    "rating": null,
+    "workloadHrs": 3.58,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ESE 133",
+    "title": "Atmospheric Chemistry",
+    "rating": null,
+    "workloadHrs": 6.22,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FOLKMYTH 141",
+    "title": "Elves, Fairies, and UFOs: Dangerous Encounters with Otherworldly Beings in Folklore",
+    "rating": null,
+    "workloadHrs": 4.18,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "RELIGION 116",
+    "title": "The Conduct of Life in Western and Eastern Philosophy",
+    "rating": null,
+    "workloadHrs": 3.86,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STAT 102",
+    "title": "Introduction to Statistics for Life Sciences",
+    "rating": null,
+    "workloadHrs": 8.71,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STDY 97B",
+    "title": "Introduction to the Ancient Roman World",
+    "rating": null,
+    "workloadHrs": 7.23,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FYSEMR 51X",
+    "title": "Changing Perspectives: the Science of Optics in the Visual Arts",
+    "rating": null,
+    "workloadHrs": 2.11,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FYSEMR 73U",
+    "title": "Reading the History of Boston",
+    "rating": null,
+    "workloadHrs": 2.25,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HEB 190",
+    "title": "Advanced Topics in Human Physiology",
+    "rating": null,
+    "workloadHrs": 3.45,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "AFRAMER 97",
+    "title": "Sophomore Tutorial: Understanding Race and Racism",
+    "rating": null,
+    "workloadHrs": 3.6,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "SCI 277",
+    "title": "Microfabrication Laboratory",
+    "rating": null,
+    "workloadHrs": 3.77,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "SCI 177",
+    "title": "Microfabrication Laboratory",
+    "rating": null,
+    "workloadHrs": 3.77,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HEB 126",
+    "title": "Research in Cultural Evolution",
+    "rating": null,
+    "workloadHrs": 3.83,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MBB 980M",
+    "title": "Functional Neuroimaging of Psychiatric Disorders: Insights into the Human Brain-Mind",
+    "rating": null,
+    "workloadHrs": 3.91,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PHIL 18",
+    "title": "Human Ethics: A Brief History",
+    "rating": null,
+    "workloadHrs": 3.92,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ESPP 160",
+    "title": "US Environmental Policy and Policymaking: The Role of Congress, EPA, Stakeholders, and Courts",
+    "rating": null,
+    "workloadHrs": 3.93,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "RSRA 298B",
+    "title": "Master's Thesis Reading and Research",
+    "rating": null,
+    "workloadHrs": 4,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CHEM 165",
+    "title": "Experimental Physical Chemistry",
+    "rating": null,
+    "workloadHrs": 4,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CHNSHIS 146",
+    "title": "The Modern History of Rural China",
+    "rating": null,
+    "workloadHrs": 6.17,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "JAPAN 140B",
+    "title": "Advanced Modern Japanese",
+    "rating": null,
+    "workloadHrs": 6.63,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PSCI 99B",
+    "title": "Tutorial - Senior Year",
+    "rating": null,
+    "workloadHrs": 14,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "OEB 52",
+    "title": "Biology of Plants",
+    "rating": null,
+    "workloadHrs": 4.85,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STAT 117",
+    "title": "Data Analysis in Modern Biostatistics",
+    "rating": null,
+    "workloadHrs": 8.45,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MUSIC 189R",
+    "title": "Chamber Music Performance",
+    "rating": null,
+    "workloadHrs": 5.82,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "AFVS 61",
+    "title": "Sight and Sound: Introduction to Narrative Filmmaking",
+    "rating": null,
+    "workloadHrs": 9,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FYSEMR 23K",
+    "title": "Insights from Narratives of Illness",
+    "rating": null,
+    "workloadHrs": 4.13,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ANE 120B",
+    "title": "Introduction to the Hebrew Bible/Old Testament 2: Latter Prophets and Writings",
+    "rating": null,
+    "workloadHrs": 4.71,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FT 101B",
+    "title": "Elementary Filipino (Tagalog) II",
+    "rating": null,
+    "workloadHrs": 4.71,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "EDST 135",
+    "title": "Education Across Cultures: Beliefs and Practices in Schools and Families",
+    "rating": null,
+    "workloadHrs": 4.13,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HEB 110",
+    "title": "Research in Human Biomechanics and Physiology",
+    "rating": null,
+    "workloadHrs": 6,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "AFRAMER 223",
+    "title": "Storied Lives: Methods in Oral History",
+    "rating": null,
+    "workloadHrs": 6.47,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HIST 97B",
+    "title": "\"What is Intellectual History?\"",
+    "rating": null,
+    "workloadHrs": 9.83,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HIST 16N",
+    "title": "The Neoliberal Age",
+    "rating": null,
+    "workloadHrs": 6.2,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "SLAVIC 118",
+    "title": "Reading Tolstoy’s War and Peace",
+    "rating": null,
+    "workloadHrs": 6.14,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "FYSEMR 42C",
+    "title": "The Role of Government",
+    "rating": null,
+    "workloadHrs": 5,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ITAL 50",
+    "title": "Advanced Italian II: Advanced Written Expression - Writing for Social Justice",
+    "rating": null,
+    "workloadHrs": 7,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STD 50",
+    "title": "Foundations of Social Science Research",
+    "rating": null,
+    "workloadHrs": 5.5,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "BIOSTAT 231",
+    "title": "Statistical Inference I",
+    "rating": null,
+    "workloadHrs": 15.63,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "HAA 100R",
+    "title": "Sophomore Excursion Course",
+    "rating": null,
+    "workloadHrs": 4.25,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MATH 55B",
+    "title": "Studies in Real and Complex analysis",
+    "rating": null,
+    "workloadHrs": 17.85,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MATH 25B",
+    "title": "Theoretical Linear Algebra and Real Analysis II",
+    "rating": null,
+    "workloadHrs": 12.14,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "II\n\n\t\n\n4",
+    "title": "Microeconomic Theory .7 (Overall)",
+    "rating": null,
+    "workloadHrs": 7.45,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "GHHP 20",
+    "title": "Maternal & Reproductive Health and Health Policy",
+    "rating": null,
+    "workloadHrs": 4.53,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "RELIGION 97",
+    "title": "Tutorial - Sophomore Year",
+    "rating": null,
+    "workloadHrs": 7.5,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CHEM 20",
+    "title": "Organic Chemistry",
+    "rating": null,
+    "workloadHrs": 11.23,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MCB 68",
+    "title": "Cell Biology Through the Microscope",
+    "rating": null,
+    "workloadHrs": 6.45,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CS 61",
+    "title": "COMPSCI 1610",
+    "rating": null,
+    "workloadHrs": 15.95,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PHIL 173E",
+    "title": "Is Ethics Objective?",
+    "rating": null,
+    "workloadHrs": 6.2,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "BCMP 213",
+    "title": "Behavioral Pharmacology",
+    "rating": null,
+    "workloadHrs": 5.14,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CPB 99B",
+    "title": "Laboratory Research for Honors Thesis",
+    "rating": null,
+    "workloadHrs": 21.43,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STAT 149",
+    "title": "Introduction to Generalized Linear Models",
+    "rating": null,
+    "workloadHrs": 7.25,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "GOV 51",
+    "title": "Data Analysis and Politics",
+    "rating": null,
+    "workloadHrs": 8,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "SCRB 167",
+    "title": "Stem Cell Therapeutics: Exploring the Science and the Patient Experience",
+    "rating": null,
+    "workloadHrs": 4.27,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PSY 11",
+    "title": "Cognition: How the Mind Works",
+    "rating": null,
+    "workloadHrs": 5.08,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MCB 130",
+    "title": "The pharmacy of life – exploring the function and biochemistry of natural products",
+    "rating": null,
+    "workloadHrs": 7.92,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "COMPLIT 290",
+    "title": "Migration and the Humanities",
+    "rating": null,
+    "workloadHrs": 6.44,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MCB 102",
+    "title": "Creativity, Innovation, and Entrepreneurship in the Life Sciences",
+    "rating": null,
+    "workloadHrs": 4.22,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MUSIC 161R",
+    "title": "Advanced Composition",
+    "rating": null,
+    "workloadHrs": 4.63,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "APMTH 120",
+    "title": "Applied Linear Algebra and Big Data",
+    "rating": null,
+    "workloadHrs": 8.35,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PHYSICS 137",
+    "title": "Philosophy of Quantum Theory",
+    "rating": null,
+    "workloadHrs": 7.64,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PHIL 151",
+    "title": "Philosophy of Quantum Theory",
+    "rating": null,
+    "workloadHrs": 7.64,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "BE 124",
+    "title": "Biomechanics of Movement and Assistive Robotics",
+    "rating": null,
+    "workloadHrs": 7.66,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PHYSICS 247",
+    "title": "Laboratory Course in Contemporary Physics",
+    "rating": null,
+    "workloadHrs": 8.36,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CE 11",
+    "title": "StudioLab on Creativity and Entrepreneurship",
+    "rating": null,
+    "workloadHrs": 6.33,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "APPHY 216",
+    "title": "Quantum and Classical Electromagnetic Interaction with Matter",
+    "rating": null,
+    "workloadHrs": 8.3,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STDY 112",
+    "title": "Regional Study: Sicily",
+    "rating": null,
+    "workloadHrs": 4.6,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STAT 213",
+    "title": "Statistical Inference II",
+    "rating": null,
+    "workloadHrs": 12.67,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PHYSICS 153",
+    "title": "Electrodynamics",
+    "rating": null,
+    "workloadHrs": 9.33,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "CHEM 171",
+    "title": "Biological Synthesis",
+    "rating": null,
+    "workloadHrs": 8.67,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ESE 101",
+    "title": "Global Warming Science 101",
+    "rating": null,
+    "workloadHrs": 5.45,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "PSCI 101",
+    "title": "Global Warming Science 101",
+    "rating": null,
+    "workloadHrs": 5.45,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "STAT 109B",
+    "title": "Data Science 2: Advanced Topics in Data Science",
+    "rating": null,
+    "workloadHrs": 11.41,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "APCOMP 209B",
+    "title": "Data Science 2: Advanced Topics in Data Science",
+    "rating": null,
+    "workloadHrs": 11.41,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "MATH 121",
+    "title": "Linear Algebra",
+    "rating": null,
+    "workloadHrs": 8.43,
+    "sentiment": 0.5
+  },
+  {
+    "courseId": "ANTHRO 98B",
+    "title": "Junior Tutorial for Thesis Writers in Anthropology",
+    "rating": null,
+    "workloadHrs": 5.64,
+    "sentiment": 0.5
+  }
+]

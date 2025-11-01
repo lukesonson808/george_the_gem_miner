@@ -1,0 +1,45 @@
+{
+  "name": "georgie-the-gem-miner",
+  "version": "1.0.0",
+  "description": "Georgie the Gem Miner - Harvard's Q-Report Course Advisor Agent",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "tunnel": "localtunnel --port 3000",
+    "check": "node check-config.js",
+    "georgie:update": "node scripts/update-qreport-data.js",
+    "georgie:test": "node -e \"const {findGems} = require('./services/gem-miner'); findGems({filters: {department: 'COMPSCI'}}).then(g => console.log('✅ Georgie working!', g.length, 'courses found'));\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/georgie-the-gem-miner.git"
+  },
+  "keywords": [
+    "harvard",
+    "course-advisor",
+    "q-report",
+    "gemini",
+    "ai-agent",
+    "webhook",
+    "chatbot",
+    "a1zap",
+    "course-recommendations"
+  ],
+  "author": "Georgie the Gem Miner Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.67.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.13.1",
+    "body-parser": "^1.20.2",
+    "cheerio": "^1.1.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "puppeteer": "^24.27.0"
+  },
+  "devDependencies": {
+    "localtunnel": "^2.0.2",
+    "nodemon": "^3.0.1"
+  }
+}
