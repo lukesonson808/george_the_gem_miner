@@ -282,10 +282,42 @@ class CatalogAYLoader {
    * Get course by exact course ID
    */
   getCourseById(courseId) {
+    if (!courseId) return undefined;
+    
     const courses = this.loadData();
-    return courses.find(c => 
-      c.courseId.toUpperCase() === courseId.toUpperCase()
+    const searchId = courseId.toUpperCase().trim();
+    
+    // Try exact match first
+    let course = courses.find(c => 
+      c.courseId.toUpperCase().trim() === searchId
     );
+    
+    if (course) return course;
+    
+    // Try matching without section numbers (e.g., "COMPSCI 50 001" matches "COMPSCI 50")
+    course = courses.find(c => {
+      const cId = c.courseId.toUpperCase().trim();
+      return cId === searchId || cId.startsWith(searchId + ' ');
+    });
+    
+    if (course) return course;
+    
+    // Try CS/COMPSCI variations (e.g., "CS 50" matches "COMPSCI 50")
+    if (searchId.startsWith('CS ')) {
+      const compsciId = searchId.replace('CS ', 'COMPSCI ');
+      course = courses.find(c => {
+        const cId = c.courseId.toUpperCase().trim();
+        return cId === compsciId || cId.startsWith(compsciId + ' ');
+      });
+    } else if (searchId.startsWith('COMPSCI ')) {
+      const csId = searchId.replace('COMPSCI ', 'CS ');
+      course = courses.find(c => {
+        const cId = c.courseId.toUpperCase().trim();
+        return cId === csId || cId.startsWith(csId + ' ');
+      });
+    }
+    
+    return course;
   }
 }
 

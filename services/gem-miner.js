@@ -4,6 +4,7 @@ const CatalogAYLoader = require('./catalog-ay-loader'); // Load full AY 2025-202
 const catalog = require('./catalog-parser');
 const canvas = require('./canvas-signals');
 const { rankCourses } = require('./gem-ranking');
+const { getGenEdCategory } = require('./gened-categories');
 
 // Initialize loaders
 const qreportLoader = new QReportLoader();
@@ -19,24 +20,31 @@ function mergeCourseData(qCourse, catalogEntry, canvasSignal) {
   const title = qCourse?.title || catalogEntry?.title || 'Unknown Title';
   const courseId = qCourse?.courseId || catalogEntry?.courseId || 'UNKNOWN';
   
-  // Get meeting time info from catalog (it has separate weekdays, startTime, endTime fields)
-  const weekdays = qCourse?.weekdays || catalogEntry?.weekdays || null;
-  const startTime = qCourse?.startTime || catalogEntry?.startTime || null;
-  const endTime = qCourse?.endTime || catalogEntry?.endTime || null;
+  // Get meeting time info from catalog (prioritize catalog over Q-Report since catalog has current term data)
+  // Q-Report data is from Spring 2025, catalog is from 2025-2026 (more current)
+  const weekdays = catalogEntry?.weekdays || qCourse?.weekdays || null;
+  const startTime = catalogEntry?.startTime || qCourse?.startTime || null;
+  const endTime = catalogEntry?.endTime || qCourse?.endTime || null;
   const meetingTime = weekdays && startTime && endTime 
     ? `${weekdays} ${startTime}-${endTime}`
-    : catalogEntry?.meeting || null;
+    : (catalogEntry?.meeting || null);
+  
+  // Determine if this is a GenEd and get its category
+  const isGenEd = catalogEntry?.subject?.toUpperCase() === 'GENED' || genEd !== null;
+  const genEdCategory = isGenEd ? getGenEdCategory(courseId) : null;
   
   return {
     courseId,
     title,
     department: qCourse?.department || catalogEntry?.department || catalogEntry?.subject || null,
+    subject: catalogEntry?.subject || null, // Preserve subject field for GenEd detection
     rating,
     workloadHrs,
     sentiment,
     assessmentLightness,
     meetingTime,
     genEd,
+    genEdCategory, // Add GenEd category (Aesthetics and Culture, Ethics and Civics, etc.)
     finalExam,
     // Include Q-Report link and other metadata from qCourse
     qreportLink: qCourse?.qreportLink || null,
@@ -164,6 +172,25 @@ async function findGems(query = {}) {
     const d = String(query.department).toLowerCase();
     filtered = filtered.filter(c => String(c.department || '').toLowerCase().includes(d));
   }
+  // Filter by specific course code if provided (e.g., "COMPSCI 50" for "CS50")
+  if (query.courseCode) {
+    const codeUpper = String(query.courseCode).toUpperCase().trim();
+    filtered = filtered.filter(c => {
+      const courseId = String(c.courseId || '').toUpperCase().trim();
+      // Match exact course code (e.g., "COMPSCI 50" matches "COMPSCI 50")
+      // Also handle section numbers (e.g., "COMPSCI 50" matches "COMPSCI 50 001")
+      return courseId === codeUpper || courseId.startsWith(codeUpper + ' ');
+    });
+    console.log(`🎯 Filtered to course code "${codeUpper}": ${filtered.length} courses found`);
+  }
+  
+  // Filter by GenEd category if specified
+  if (query.genEdCategory) {
+    filtered = filtered.filter(c => {
+      return c.genEdCategory === query.genEdCategory;
+    });
+    console.log(`🎓 Filtered to GenEd category "${query.genEdCategory}": ${filtered.length} courses found`);
+  }
   
   console.log(`✅ Gem Miner: ${filtered.length} courses after filtering`);
 
@@ -199,6 +226,15 @@ async function getAllAvailableCourses(filters = {}) {
     courses = courses.filter(c => {
       if (!c.meetingParsed || !c.meetingParsed.weekdays) return false;
       return c.meetingParsed.weekdays.toLowerCase().includes(weekdaysLower);
+    });
+  }
+  
+  // Filter by course code if provided
+  if (filters.courseCode) {
+    const codeUpper = String(filters.courseCode).toUpperCase().trim();
+    courses = courses.filter(c => {
+      const courseId = String(c.courseId || '').toUpperCase().trim();
+      return courseId === codeUpper || courseId.startsWith(codeUpper + ' ');
     });
   }
   

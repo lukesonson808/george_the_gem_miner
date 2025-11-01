@@ -20,6 +20,16 @@ if (config.gemini.apiKey && !config.gemini.apiKey.includes('your_')) {
   console.log('  Set GEMINI_API_KEY environment variable');
 }
 
+// Check Claude API
+console.log('\n🤖 Claude API:');
+if (config.claude.apiKey && !config.claude.apiKey.includes('your_')) {
+  console.log('  ✅ Configured');
+  console.log(`  Model: ${config.claude.defaultModel}`);
+} else {
+  console.log('  ❌ Not configured');
+  console.log('  Set CLAUDE_API_KEY environment variable');
+}
+
 // Check Gem Miner A1Zap API
 console.log('\n⛏️  Gem Miner A1Zap:');
 const gemMinerConfig = config.agents.gemMiner;
@@ -78,17 +88,19 @@ console.log('  GET  /health             - Health check');
 // Summary
 console.log('\n' + '='.repeat(50));
 const geminiOk = config.gemini.apiKey && !config.gemini.apiKey.includes('your_');
+const claudeOk = config.claude.apiKey && !config.claude.apiKey.includes('your_');
 const a1zapOk = gemMinerConfig.apiKey && !gemMinerConfig.apiKey.includes('your_') && 
                 gemMinerConfig.agentId && !gemMinerConfig.agentId.includes('your_');
 const dataOk = fs.existsSync(qreportPath) && fs.existsSync(catalogPath);
 
 console.log('\n📊 Summary:');
-if (geminiOk && a1zapOk && dataOk) {
+if (claudeOk && a1zapOk && dataOk) {
   console.log('  ✅ All configurations complete! Georgie is ready to go!\n');
 } else {
   console.log('  ⚠️  Some configurations missing. Check above for details.\n');
   
-  if (!geminiOk) console.log('  - Set GEMINI_API_KEY');
+  if (!claudeOk) console.log('  - Set CLAUDE_API_KEY (required - Georgie uses Claude)');
+  if (!geminiOk) console.log('  - Set GEMINI_API_KEY (optional - for image features)');
   if (!a1zapOk) console.log('  - Set GEM_MINER_API_KEY and GEM_MINER_AGENT_ID (or A1ZAP_API_KEY and A1ZAP_AGENT_ID)');
   if (!dataOk) console.log('  - Ensure Q-Report and course catalog data files exist');
   console.log();

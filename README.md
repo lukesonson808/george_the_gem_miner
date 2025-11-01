@@ -41,9 +41,10 @@ nano .env  # Add your API keys
 
 Required environment variables:
 ```bash
-GEMINI_API_KEY=your_gemini_api_key
-GEM_MINER_API_KEY=your_a1zap_api_key  # or use A1ZAP_API_KEY
-GEM_MINER_AGENT_ID=your_agent_id      # or use A1ZAP_AGENT_ID
+CLAUDE_API_KEY=your_claude_api_key     # Required - Georgie uses Claude for sophisticated responses
+GEMINI_API_KEY=your_gemini_api_key     # Optional - for image features
+GEM_MINER_API_KEY=your_a1zap_api_key   # or use A1ZAP_API_KEY
+GEM_MINER_AGENT_ID=your_agent_id       # or use A1ZAP_AGENT_ID
 ```
 
 ### 2. Verify Setup

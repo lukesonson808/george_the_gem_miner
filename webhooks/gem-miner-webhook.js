@@ -1,12 +1,14 @@
 const BaseWebhook = require('../core/BaseWebhook');
 const BaseA1ZapClient = require('../core/BaseA1ZapClient');
 const geminiService = require('../services/gemini-service');
+const claudeService = require('../services/claude-service');
 const gemMinerAgent = require('../agents/gem-miner-agent');
 const webhookHelpers = require('../services/webhook-helpers');
 const conversationCache = require('../services/conversation-cache');
 const config = require('../config');
 const { findGems, getAllAvailableCourses, getCourseDetails } = require('../services/gem-miner');
 const { mapDepartment } = require('../services/department-mapper');
+const { getGenEdCategory } = require('../services/gened-categories');
 
 /**
  * Georgie the Gem Miner webhook handler (text-first ranking)
@@ -436,11 +438,17 @@ class GemMinerWebhook extends BaseWebhook {
       let maxResults = 10; // Default to 10
       
       // 🚨 QUERY TYPE DETECTION - Are they asking ABOUT a course or asking FOR a course?
+      // Check for course code patterns (e.g., "CS 50", "CS50", "COMPSCI 50")
+      const courseCodePattern = /\b([A-Z]{2,}\s*\d+[A-Z]?|CS\s*\d+|CS\d+)\b/i;
+      const hasCourseCode = courseCodePattern.test(userMessage);
+      
       // ONLY treat as "asking about" if they're asking for info on a SPECIFIC named course
-      // NOT if they're asking for recommendations (e.g., "what's the easiest")
+      // OR if they mention a course code with questions like "what time", "when does", etc.
       const isAskingAboutSpecificCourse = userMessageLower.match(/\b(tell me (about|more about)|more (info|information) (about|on)|describe|explain)\b/) ||
-                                          (userMessageLower.match(/\b(what is|what's)\b/) && !userMessageLower.match(/\b(easiest|best|hardest|most|least|good|bad|chill|easy|hard)\b/));
+                                          (userMessageLower.match(/\b(what (is|time|are)|what's|when (does|is))\b/) && !userMessageLower.match(/\b(easiest|best|hardest|most|least|good|bad|chill|easy|hard)\b/)) ||
+                                          (hasCourseCode && (userMessageLower.includes('what time') || userMessageLower.includes('when does') || userMessageLower.includes('when is') || userMessageLower.includes('meet')));
       console.log(`📝 Query type: ${isAskingAboutSpecificCourse ? 'ASKING ABOUT a course' : 'ASKING FOR a recommendation'}`);
+      if (hasCourseCode) console.log(`📝 Course code detected in query`);
       
       // Check for list requests FIRST (before "a" catches "a list")
       if (userMessageLower.match(/\b(list|several|many|multiple)\b/)) {
@@ -480,7 +488,8 @@ class GemMinerWebhook extends BaseWebhook {
       const catalogCourses = await getAllAvailableCourses({
         term: '2026 Spring', // ONLY Spring 2026
         subject: query.filters?.department,
-        weekdays: query.preferredTimes?.find(t => ['tue', 'thu', 'mon', 'wed', 'fri'].includes(t))
+        weekdays: query.preferredTimes?.find(t => ['tue', 'thu', 'mon', 'wed', 'fri'].includes(t)),
+        courseCode: query.filters?.courseCode // Include course code if specified
       });
       console.log(`📚 Found ${catalogCourses.length} Spring 2026 courses in catalog matching criteria`);
       
@@ -501,14 +510,75 @@ class GemMinerWebhook extends BaseWebhook {
       
       console.log(`💎 Found ${ranked.length} courses total, ${gemsWithData.length} with complete Q-Report data in Spring 2026`);
       
-      if (gemsWithData.length > 0) {
+      // If asking about a specific course and we have a course code, look it up in the catalog
+      let specificCourseFromCatalog = null;
+      if (isAskingAboutSpecificCourse && query.filters?.courseCode) {
+        console.log(`🔍 Looking up specific course in catalog: ${query.filters.courseCode}`);
+        specificCourseFromCatalog = getCourseDetails(query.filters.courseCode);
+        if (specificCourseFromCatalog) {
+          console.log(`✅ Found course in catalog: ${specificCourseFromCatalog.courseId}`);
+        } else {
+          // Try with different variations (e.g., "COMPSCI 50" vs "CS 50")
+          const codeVariations = [
+            query.filters.courseCode.replace('COMPSCI', 'CS'),
+            query.filters.courseCode.replace('CS', 'COMPSCI')
+          ];
+          for (const variation of codeVariations) {
+            specificCourseFromCatalog = getCourseDetails(variation);
+            if (specificCourseFromCatalog) {
+              console.log(`✅ Found course with variation: ${variation}`);
+              break;
+            }
+          }
+        }
+      }
+      
+      if (gemsWithData.length > 0 || specificCourseFromCatalog) {
         // Build gem data as context for Gemini - limit to user's requested quantity
-        const top = gemsWithData.slice(0, maxResults); // Use detected quantity
+        let top = gemsWithData.slice(0, maxResults); // Use detected quantity
+        
+        // If we found a specific course in catalog but not in gems, add it to the list
+        if (specificCourseFromCatalog && !top.find(c => c.courseId === specificCourseFromCatalog.courseId)) {
+          console.log(`➕ Adding specific course from catalog to context`);
+          // Get GenEd category if it's a GenEd
+          const isGenEd = specificCourseFromCatalog.subject && specificCourseFromCatalog.subject.toUpperCase() === 'GENED';
+          const genEdCat = isGenEd ? getGenEdCategory(specificCourseFromCatalog.courseId) : null;
+          
+          // Convert catalog entry to gem-like format for consistency
+          const catalogAsGem = {
+            courseId: specificCourseFromCatalog.courseId,
+            title: specificCourseFromCatalog.title,
+            rating: null, // No Q-Report data
+            workloadHrs: null,
+            weekdays: specificCourseFromCatalog.weekdays,
+            startTime: specificCourseFromCatalog.startTime,
+            endTime: specificCourseFromCatalog.endTime,
+            meetingTime: specificCourseFromCatalog.meetingTime || (specificCourseFromCatalog.weekdays && specificCourseFromCatalog.startTime && specificCourseFromCatalog.endTime 
+              ? `${specificCourseFromCatalog.weekdays} ${specificCourseFromCatalog.startTime}-${specificCourseFromCatalog.endTime}`
+              : null),
+            instructors: specificCourseFromCatalog.instructors,
+            description: specificCourseFromCatalog.description,
+            qreportLink: null,
+            _hasQReportData: false,
+            _fromCatalogOnly: true,
+            subject: specificCourseFromCatalog.subject,
+            genEdCategory: genEdCat
+          };
+          // Put it at the front if asking about a specific course
+          if (isAskingAboutSpecificCourse) {
+            top = [catalogAsGem, ...top];
+          } else {
+            top.push(catalogAsGem);
+          }
+        }
+        
         console.log(`📊 Providing ${top.length} courses to AI (user requested ${maxResults})`)
         const usingDefaults = top.some(c => c._usingDefaults);
         
-        gemContext = `\n\n[AVAILABLE GEM DATA - Use this to answer the user's question about classes]:\n`;
-        if (usingDefaults) {
+        gemContext = `\n\n[AVAILABLE COURSE DATA - Use this to answer the user's question about classes]:\n`;
+        if (specificCourseFromCatalog && !gemsWithData.find(c => c.courseId === specificCourseFromCatalog.courseId)) {
+          gemContext += `⚠️ Note: Course found in catalog but may not have Q-Report data\n\n`;
+        } else if (usingDefaults) {
           gemContext += `⚠️ Note: Using default ratings (Q-Report data not fully available)\n\n`;
         } else {
           gemContext += `✅ Real Q-Report data from Spring 2025\n\n`;
@@ -537,21 +607,44 @@ class GemMinerWebhook extends BaseWebhook {
           // Strip section numbers (001, 002, etc.) from title display
           const cleanTitle = c.title.replace(/\s+00\d+\s*$/i, '').replace(/\s+\d{3}\s*$/i, '').trim();
           
-          gemContext += `${i+1}. ${cleanTitle} (${c.courseId})\n`;
+          // Check if it's a GenEd and format title with category
+          const isGenEd = c.subject && c.subject.toUpperCase() === 'GENED';
+          let titleLine = `${i+1}. ${cleanTitle} (${c.courseId})`;
+          
+          if (isGenEd) {
+            titleLine += ' 🎓';
+            if (c.genEdCategory) {
+              titleLine += ` - satisfies **${c.genEdCategory}**`;
+            }
+          }
+          
+          gemContext += `${titleLine}\n`;
+          
+          // Show Q-Report data if available, otherwise note it's catalog-only
+          if (c._fromCatalogOnly) {
+            gemContext += `   ⚠️ This course is in the catalog but doesn't have Q-Report data yet\n`;
+          }
           // DO NOT show GemScore in context - it's used for ranking only
           if (c.rating) gemContext += `   Rating: ${c.rating}/5\n`;
+          else if (c._fromCatalogOnly) {
+            gemContext += `   Rating: N/A (no Q-Report data yet)\n`;
+          }
           if (c.workloadHrs) gemContext += `   Workload: ${c.workloadHrs} hrs/week\n`;
+          else if (c._fromCatalogOnly) {
+            gemContext += `   Workload: N/A (no Q-Report data yet)\n`;
+          }
           
           // Format meeting times from weekdays + start/end time
+          // Prioritize the separate fields as they're more accurate from catalog
           if (c.weekdays && c.startTime && c.endTime) {
             gemContext += `   Meets: ${c.weekdays} ${c.startTime}-${c.endTime}\n`;
           } else if (c.meetingTime) {
             gemContext += `   Meets: ${c.meetingTime}\n`;
+          } else {
+            gemContext += `   Meets: N/A\n`;
           }
           
-          // Mark if it's a GenEd (subject = "GENED" ONLY)
-          const isGenEd = c.subject && c.subject.toUpperCase() === 'GENED';
-          if (isGenEd) gemContext += `   🎓 This is a GenEd course (subject = GENED)\n`;
+          // Note: GenEd category is already shown in title line above
           if (c.instructors) gemContext += `   Instructor: ${c.instructors}\n`;
           if (c.finalExam === false || c.finalExam === 'no') gemContext += `   No final exam!\n`;
           
@@ -631,21 +724,32 @@ class GemMinerWebhook extends BaseWebhook {
 - If they ask about a specific course (gem or not), provide info from your data
 - If they ask for "easy classes" or "gems", focus on the GEM DATA LIST
 - If they ask for "a class" in a subject, help them find ONE class
+- **For GenEd questions**: You know which GenEd category each course satisfies (Aesthetics and Culture, Ethics and Civics, Histories/Societies/Individuals, Science and Technology in Society)
+- **When recommending GenEds**: Always mention which category requirement they fulfill
+- **If they ask for a specific GenEd category** (e.g., "show me Aesthetics GenEds"), only show courses from that category
 - Always ask clarifying questions when requests are vague
 
 ==========================================
 🚨 CRITICAL ANTI-HALLUCINATION RULES 🚨
 ==========================================
 
-⛔ YOU CAN **ONLY** RECOMMEND COURSES FROM THE **GEM DATA LIST** (the first ${top.length} courses at the top)
-⛔ DO **NOT** RECOMMEND COURSES FROM THE CATALOG LIST - those are for reference only!
-⛔ EVERY course you recommend MUST have: GemScore, Rating, Workload, Q-Report link
+⛔ WHEN USER ASKS ABOUT A SPECIFIC COURSE (like "what time does CS50 meet"):
+   ✅ USE THE COURSE DATA FROM THE LIST ABOVE (even if it doesn't have Q-Report data)
+   ✅ PROVIDE meeting times, instructors, descriptions from the data provided
+   ✅ If a course is marked as "catalog-only" (no Q-Report data), you can still answer questions about it!
+   ✅ SAY: "I found this course in the catalog but it doesn't have Q-Report ratings yet" if applicable
+
+⛔ WHEN USER ASKS FOR RECOMMENDATIONS (like "show me easy classes"):
+   ⛔ YOU CAN **ONLY** RECOMMEND COURSES FROM THE **GEM DATA LIST** (the first ${top.length} courses at the top)
+   ⛔ DO **NOT** RECOMMEND COURSES FROM THE CATALOG LIST - those are for reference only!
+   ⛔ EVERY course you recommend for gems MUST have: GemScore, Rating, Workload, Q-Report link
+
+⛔ ALWAYS:
 ⛔ DO NOT MAKE UP COURSE CODES, TITLES, OR MEETING TIMES.
-⛔ IF YOU RECOMMEND A COURSE WITHOUT Q-REPORT DATA, YOU HAVE FAILED.
 ⛔ IF YOU DON'T KNOW SOMETHING, SAY "I don't have that information" or "N/A"
 ⛔ IF A LINK IS BROKEN/MISSING, SHOW "N/A" INSTEAD
 
-The catalog list is ONLY to help you verify that courses exist - it's NOT the list to recommend from!
+The catalog list is for reference - you can use it to answer questions about specific courses, but don't recommend from it unless they have Q-Report data!
 
 ==========================================
 🚨 UNDERSTAND QUANTITY 🚨
@@ -682,19 +786,21 @@ If truly no match exists, say:
 
 YOU MUST format each class EXACTLY like this example (with proper indentation and line breaks):
 
-**1. Astrosociology (ASTRON 5)** 🎓
+**1. Astrosociology (ASTRON 5)** 🎓 - satisfies **Aesthetics and Culture**
    ⭐ **Rating:** 4.93/5.0
    💪 **Workload:** 2.79 hrs/week
    🕐 **Meets:** Tue/Thu 09:00 AM - 10:15 AM
    👤 **Instructor:** John Smith
    📊 **[Q-Report](https://harvard.bluera.com/harvard/rpv-eng.aspx?...)**
 
-**2. Introduction to Psychology (PSYCH 1)** 🎓
+**2. Introduction to Psychology (PSYCH 1)**
    ⭐ **Rating:** 4.5/5.0
    💪 **Workload:** 4.2 hrs/week
    🕐 **Meets:** Mon/Wed/Fri 10:00 AM - 11:00 AM
    👤 **Instructor:** Jane Doe
    📊 **[Q-Report](https://harvard.bluera.com/...)**
+   
+   (Note: This example is NOT a GenEd, so no 🎓 or category)
 
 **3. Advanced Calculus (MATH 25A)**
    ⭐ **Rating:** 4.2/5.0
@@ -702,6 +808,8 @@ YOU MUST format each class EXACTLY like this example (with proper indentation an
    🕐 **Meets:** Mon/Wed/Fri 10:00 AM - 11:00 AM
    👤 **Instructor:** Bob Johnson
    📊 **[Q-Report](https://harvard.bluera.com/...)**
+   
+   (Example of a non-GenEd course)
 
 CRITICAL FORMATTING RULES:
 ✅ Each field MUST be on its OWN LINE
@@ -709,11 +817,11 @@ CRITICAL FORMATTING RULES:
 ✅ Use **bold** for ALL labels (Rating:, Workload:, etc.)
 ✅ Q-Report MUST use markdown link: **[Q-Report](URL)** NOT plain text
 ✅ Add 🎓 emoji after course title ONLY if it's a GenEd
+✅ **For GenEd courses, ALWAYS include the category in the title line**: "Course Title (GENED 1034) 🎓 - satisfies **Aesthetics and Culture**"
 ✅ Add BLANK LINE after each course
 ❌ DO NOT show GemScore in the output
 ❌ DO NOT add "💎 Excellent gem!" or quality notes after courses
 ❌ DO NOT show section numbers (001, 002, 003) in course titles
-❌ DO NOT show "📚 GenEd: [category]" field - just use 🎓 emoji
 ❌ DO NOT put everything on one line!
 ❌ DO NOT use plain text URLs!
 ❌ DO NOT show "About this course:" or descriptions when listing multiple courses
@@ -840,14 +948,26 @@ Would you like to:
       messages[messages.length - 1].content += gemContext;
     }
 
-    // Let Gemini generate a natural conversational response
-    console.log('🤖 Generating Georgie response with Gemini...');
-    const responseText = await geminiService.chat(messages, {
-      systemInstruction: this.agent.getSystemPrompt(),
-      temperature: this.agent.getGenerationOptions().temperature || 0.3, // Low temp to prevent hallucinations
-      maxOutputTokens: this.agent.getGenerationOptions().maxOutputTokens || 800,
-      model: this.agent.getGenerationOptions().model || 'gemini-2.0-flash-exp'
-    });
+    // Use Claude or Gemini based on agent configuration
+    const useClaude = this.agent.usesClaude();
+    const systemPrompt = this.agent.getSystemPrompt();
+    const genOptions = this.agent.getGenerationOptions();
+    
+    console.log(`🤖 Generating Georgie response with ${useClaude ? 'Claude' : 'Gemini'}...`);
+    
+    const responseText = useClaude
+      ? await claudeService.chat(messages, {
+          systemPrompt: systemPrompt,
+          temperature: genOptions.temperature || 0.3,
+          maxTokens: genOptions.maxTokens || 8192,
+          model: genOptions.model || config.claude.defaultModel
+        })
+      : await geminiService.chat(messages, {
+          systemInstruction: systemPrompt,
+          temperature: genOptions.temperature || 0.3,
+          maxOutputTokens: genOptions.maxOutputTokens || 800,
+          model: genOptions.model || 'gemini-2.0-flash-exp'
+        });
 
     console.log('✅ Georgie responded:', responseText.substring(0, 100) + '...');
 
@@ -861,7 +981,7 @@ Would you like to:
   }
   
   /**
-   * Determine if user is asking for gem/class recommendations
+   * Determine if user is asking for gem/class recommendations or course information
    */
   shouldFetchGems(userMessage) {
     const text = (userMessage || '').toLowerCase();
@@ -873,8 +993,21 @@ Would you like to:
       'best', 'list', 'options', 'what are', 'give me', 'looking for'
     ];
     
-    // Check if message contains gem-seeking keywords
-    return gemKeywords.some(keyword => text.includes(keyword));
+    // Keywords that indicate user is asking about a specific course
+    const courseInfoKeywords = [
+      'what time', 'when does', 'when is', 'tell me about', 'what is',
+      'describe', 'explain', 'course', 'class', 'meet', 'meeting time',
+      'meets', 'schedule', 'instructor', 'professor', 'rating', 'workload'
+    ];
+    
+    // Check for course code patterns (e.g., "CS 50", "CS50", "COMPSCI 50")
+    const courseCodePattern = /\b([A-Z]{2,}\s*\d+[A-Z]?|CS\s*\d+|CS\d+)\b/i;
+    const hasCourseCode = courseCodePattern.test(userMessage);
+    
+    // Fetch data if asking for recommendations OR asking about a specific course
+    return gemKeywords.some(keyword => text.includes(keyword)) ||
+           (courseInfoKeywords.some(keyword => text.includes(keyword)) && hasCourseCode) ||
+           hasCourseCode; // Always fetch if a course code is mentioned
   }
 
   extractQuery(userMessage = '') {
@@ -882,10 +1015,26 @@ Would you like to:
     const query = { filters: {} };
     
     // GenEd detection - CRITICAL: GenEds have subject = "GENED"
+    // Also detect specific GenEd category requests
     if (text.includes('gened') || text.includes('gen ed') || text.includes('general education')) {
       query.filters.department = 'GENED';
       query.filters.isGenEd = true;
       console.log('🎓 GenEd request detected - filtering for subject = GENED');
+      
+      // Check for specific category mentions
+      if (text.includes('aesthetics') || text.includes('culture')) {
+        query.filters.genEdCategory = 'Aesthetics and Culture';
+        console.log('🎨 Aesthetics and Culture category detected');
+      } else if (text.includes('ethics') || text.includes('civics')) {
+        query.filters.genEdCategory = 'Ethics and Civics';
+        console.log('⚖️ Ethics and Civics category detected');
+      } else if (text.includes('histories') || text.includes('societies') || text.includes('individuals')) {
+        query.filters.genEdCategory = 'Histories, Societies, Individuals';
+        console.log('📚 Histories, Societies, Individuals category detected');
+      } else if (text.includes('science') && (text.includes('technology') || text.includes('society'))) {
+        query.filters.genEdCategory = 'Science and Technology in Society';
+        console.log('🔬 Science and Technology in Society category detected');
+      }
     }
     
     // Smart department matching using the mapper (skip if GenEd already set)
@@ -899,6 +1048,23 @@ Would you like to:
           query.filters.titleSearch = mapped.titleSearch;
         }
       }
+    }
+    
+    // Extract course code from query (e.g., "CS50", "CS 50", "COMPSCI 50")
+    // This helps filter to the specific course when asking about it
+    const courseCodeMatch = text.match(/\b(?:([A-Z]{2,})\s*)?(\d+[A-Z]?)\b/i);
+    if (courseCodeMatch) {
+      const [, deptCode, courseNum] = courseCodeMatch;
+      // If it's "CS50" or "CS 50", map to COMPSCI
+      if ((deptCode === 'CS' || deptCode === undefined) && courseNum) {
+        query.filters.courseCode = `COMPSCI ${courseNum}`;
+        if (!query.filters.department) {
+          query.filters.department = 'COMPSCI';
+        }
+      } else if (deptCode && courseNum) {
+        query.filters.courseCode = `${deptCode} ${courseNum}`;
+      }
+      console.log(`📝 Extracted course code: ${query.filters.courseCode}`);
     }
     
     // hrs/week heuristic

@@ -45,6 +45,7 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     config: {
       hasGeminiApiKey: !!config.gemini.apiKey && !config.gemini.apiKey.includes('your_'),
+      hasClaudeApiKey: !!config.claude.apiKey && !config.claude.apiKey.includes('your_'),
       hasA1ZapApiKey: !!config.agents.gemMiner.apiKey && !config.agents.gemMiner.apiKey.includes('your_')
     }
   });
@@ -74,13 +75,14 @@ console.log('\n🔍 Validating configuration...\n');
 
 // Validate AI services
 const geminiValidation = config.validation.validateAIService('Gemini', config.gemini);
+const claudeValidation = config.validation.validateAIService('Claude', config.claude);
 
 // Validate gem-miner agent
 const gemMinerValidation = config.validation.validateAgent('gem-miner', config.agents.gemMiner);
 
 // Collect all errors and warnings
-let allErrors = [...geminiValidation.errors, ...gemMinerValidation.errors];
-let allWarnings = [...geminiValidation.warnings, ...gemMinerValidation.warnings];
+let allErrors = [...geminiValidation.errors, ...claudeValidation.errors, ...gemMinerValidation.errors];
+let allWarnings = [...geminiValidation.warnings, ...claudeValidation.warnings, ...gemMinerValidation.warnings];
 
 // Display warnings
 if (allWarnings.length > 0) {
@@ -118,6 +120,7 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`  GET  /health                - Health check\n`);
   console.log(`Configuration:`);
   console.log(`  Gemini API: ${config.gemini.apiKey.includes('your_') ? '❌ Not configured' : '✅ Configured'}`);
+  console.log(`  Claude API: ${config.claude.apiKey.includes('your_') ? '❌ Not configured' : '✅ Configured'}`);
   console.log(`  A1Zap API: ${config.agents.gemMiner.apiKey.includes('your_') ? '❌ Not configured' : '✅ Configured'}\n`);
 });
 

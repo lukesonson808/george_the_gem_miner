@@ -10,6 +10,15 @@ module.exports = {
     maxOutputTokens: 65565
   },
 
+  claude: {
+    apiKey: process.env.CLAUDE_API_KEY || 'your_claude_api_key_here',
+    defaultModel: 'claude-sonnet-4-20250514',
+    maxTokens: 8192,
+    temperature: 0.7,
+    // Files API beta header (required for file_id references)
+    betaHeaders: ['files-api-2025-04-14']
+  },
+
   // Agent-Specific A1Zap Configurations
   agents: {
     gemMiner: {
