@@ -170,7 +170,13 @@ async function findGems(query = {}) {
   }
   if (query.department) {
     const d = String(query.department).toLowerCase();
-    filtered = filtered.filter(c => String(c.department || '').toLowerCase().includes(d));
+    // Special handling for GenEd requests - must match subject = 'GENED' exactly
+    if (d === 'gened') {
+      filtered = filtered.filter(c => String(c.subject || '').toUpperCase() === 'GENED');
+      console.log(`🎓 Filtered to GenEds (subject = GENED): ${filtered.length} courses found`);
+    } else {
+      filtered = filtered.filter(c => String(c.department || '').toLowerCase().includes(d));
+    }
   }
   // Filter by specific course code if provided (e.g., "COMPSCI 50" for "CS50")
   if (query.courseCode) {
@@ -185,11 +191,14 @@ async function findGems(query = {}) {
   }
   
   // Filter by GenEd category if specified
+  // CRITICAL: Only match courses that are actually GenEds (subject = 'GENED')
   if (query.genEdCategory) {
     filtered = filtered.filter(c => {
-      return c.genEdCategory === query.genEdCategory;
+      // Must be a GenEd AND match the category
+      return String(c.subject || '').toUpperCase() === 'GENED' && 
+             c.genEdCategory === query.genEdCategory;
     });
-    console.log(`🎓 Filtered to GenEd category "${query.genEdCategory}": ${filtered.length} courses found`);
+    console.log(`🎓 Filtered to GenEd category "${query.genEdCategory}" (subject = GENED): ${filtered.length} courses found`);
   }
   
   console.log(`✅ Gem Miner: ${filtered.length} courses after filtering`);
