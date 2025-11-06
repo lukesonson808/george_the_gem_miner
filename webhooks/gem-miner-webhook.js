@@ -11,7 +11,7 @@ const { mapDepartment } = require('../services/department-mapper');
 const { getGenEdCategory } = require('../services/gened-categories');
 
 /**
- * Georgie the Gem Miner webhook handler (text-first ranking)
+ * Steve the Schedule Helper webhook handler (text-first ranking)
  * Returns ranked course recommendations with GemScore and reasons
  * 
  * Key Features:
@@ -383,7 +383,7 @@ class GemMinerWebhook extends BaseWebhook {
    * @returns {Promise<Object>} Result with response text
    */
   async processTextMode(userMessage, conversation, chatId) {
-    console.log('⛏️ Georgie: Processing conversation...');
+    console.log('⛏️ Steve: Processing conversation...');
 
     // Build message history for Gemini chat
     let messages = conversation.map(msg => ({
@@ -832,8 +832,8 @@ CRITICAL FORMATTING RULES:
 ==========================================
 
 **NEVER EVER START WITH:**
-"Hey there! 👋 Georgie here, ready to help you find some gems! 💎"
-"Hey there! 👋 Georgie here..."
+"Hey there! 👋 Steve here, ready to help you find some gems! 💎"
+"Hey there! 👋 Steve here..."
 
 This is **COMPLETELY BANNED**. Start IMMEDIATELY with helping, NO introduction!
 
@@ -902,6 +902,16 @@ If truly no match, you MUST:
 2. Explain why: "because [reason - e.g., 'they all meet at different times']"
 3. Offer alternatives: "But here are the highest-rated easiest classes I found:"
 
+**🚨 FLEXIBLE GEM RECOMMENDATIONS:**
+- GemScore is a ranking tool, NOT a filter
+- If there aren't any "perfect gems" (90+ GemScore), still suggest the best available courses
+- Use phrases like:
+  - "There aren't any perfect gems that match exactly, but here are some great easy courses:"
+  - "I don't have any super easy gems, but here are some solid options:"
+  - "These courses are pretty manageable even if they're not perfect gems:"
+- NEVER refuse to show courses just because they don't meet a numerical cutoff
+- Always be helpful and provide options, even if they're not "perfect" gems
+
 REMEMBER: ONLY USE COURSES FROM THE LIST ABOVE. HALLUCINATION = FAILURE.`;
       } else {
         // No courses with Q-Report data found
@@ -925,9 +935,9 @@ A "gem" is a class that is:
 
 Since there are NO courses with Q-Report data matching the user's criteria, you MUST respond:
 
-"I don't have any gems for ${query.preferredTimes?.join('/') || 'those criteria'} right now. 😔
+"I don't have any gems with Q-Report data for ${query.preferredTimes?.join('/') || 'those criteria'} right now. 😔
 
-To be a 'gem,' I need real student ratings and workload data from Q-Reports (Spring 2025). The courses matching your search likely don't have data because they're:
+To be a 'gem,' I need real student ratings and workload data from Q-Reports (Spring 2026). The courses matching your search likely don't have data because they're:
 • New courses being offered for the first time 🆕
 • Courses that weren't offered last semester
 • Small seminars or independent studies
@@ -937,9 +947,9 @@ Would you like to:
 • Search a different department?
 • Or I can tell you about courses that exist (even without gem ratings)?"
 
-⛔ DO NOT list courses without ratings/workload data.
-⛔ DO NOT show "Not Available" for GemScore, Rating, or Workload.
-⛔ A course without Q-Report data is NOT a gem (but you can explain why).`;
+⛔ DO NOT list courses without ratings/workload data as "gems"
+⛔ DO NOT show "Not Available" for GemScore, Rating, or Workload
+⛔ A course without Q-Report data is NOT a gem, BUT you can still mention it exists and explain why it doesn't have data yet`;
       }
     }
 
@@ -953,7 +963,7 @@ Would you like to:
     const systemPrompt = this.agent.getSystemPrompt();
     const genOptions = this.agent.getGenerationOptions();
     
-    console.log(`🤖 Generating Georgie response with ${useClaude ? 'Claude' : 'Gemini'}...`);
+    console.log(`🤖 Generating Steve response with ${useClaude ? 'Claude' : 'Gemini'}...`);
     
     const responseText = useClaude
       ? await claudeService.chat(messages, {
@@ -969,7 +979,7 @@ Would you like to:
           model: genOptions.model || 'gemini-2.0-flash-exp'
         });
 
-    console.log('✅ Georgie responded:', responseText.substring(0, 100) + '...');
+    console.log('✅ Steve responded:', responseText.substring(0, 100) + '...');
 
     // Cache the bot's response for future reference
     conversationCache.storeResponse(chatId, responseText);
@@ -1015,23 +1025,39 @@ Would you like to:
     const query = { filters: {} };
     
     // GenEd detection - CRITICAL: GenEds have subject = "GENED"
-    // Also detect specific GenEd category requests
+    // Also detect specific GenEd category requests with SMART MATCHING
     if (text.includes('gened') || text.includes('gen ed') || text.includes('general education')) {
       query.filters.department = 'GENED';
       query.filters.isGenEd = true;
       console.log('🎓 GenEd request detected - filtering for subject = GENED');
       
-      // Check for specific category mentions
-      if (text.includes('aesthetics') || text.includes('culture')) {
+      // Smart category matching - check for partial matches
+      const lowerText = text.toLowerCase();
+      
+      // Aesthetics and Culture - match: aesthetics, culture, arts, artistic
+      if (lowerText.includes('aesthetics') || lowerText.includes('culture') || 
+          (lowerText.includes('art') && !lowerText.includes('mart'))) {
         query.filters.genEdCategory = 'Aesthetics and Culture';
         console.log('🎨 Aesthetics and Culture category detected');
-      } else if (text.includes('ethics') || text.includes('civics')) {
+      } 
+      // Ethics and Civics - match: ethics, civics, moral, political, justice
+      else if (lowerText.includes('ethics') || lowerText.includes('civics') || 
+               lowerText.includes('moral') || (lowerText.includes('political') && !lowerText.includes('apolitical')) ||
+               lowerText.includes('justice')) {
         query.filters.genEdCategory = 'Ethics and Civics';
         console.log('⚖️ Ethics and Civics category detected');
-      } else if (text.includes('histories') || text.includes('societies') || text.includes('individuals')) {
+      } 
+      // Histories, Societies, Individuals - match: histories, history, societies, society, individuals, social (but not "social science" which is different)
+      else if (lowerText.includes('histories') || lowerText.includes('history') || 
+               lowerText.includes('societies') || (lowerText.includes('society') && !lowerText.includes('science and technology')) ||
+               lowerText.includes('individuals') || (lowerText.includes('social') && !lowerText.includes('science'))) {
         query.filters.genEdCategory = 'Histories, Societies, Individuals';
         console.log('📚 Histories, Societies, Individuals category detected');
-      } else if (text.includes('science') && (text.includes('technology') || text.includes('society'))) {
+      } 
+      // Science and Technology in Society - match: science (with tech/society context), technology, tech, sci, stis
+      else if ((lowerText.includes('science') && (lowerText.includes('technology') || lowerText.includes('society') || lowerText.includes('tech'))) ||
+               (lowerText.includes('technology') && lowerText.includes('society')) ||
+               lowerText.includes('stis') || (lowerText.includes('tech') && lowerText.includes('gened'))) {
         query.filters.genEdCategory = 'Science and Technology in Society';
         console.log('🔬 Science and Technology in Society category detected');
       }

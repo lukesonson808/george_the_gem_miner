@@ -1,5 +1,5 @@
 /**
- * Georgie the Gem Miner - Server
+ * Steve the Schedule Helper - Server
  * 
  * Harvard's Q-Report Course Advisor Agent
  * 
@@ -18,7 +18,7 @@ const bodyParser = require('body-parser');
 // Core architecture
 const AgentRegistry = require('./core/AgentRegistry');
 
-// Georgie agent configuration
+// Steve the Schedule Helper agent configuration
 const gemMinerAgent = require('./agents/gem-miner-agent');
 const gemMinerWebhookHandler = require('./webhooks/gem-miner-webhook');
 
@@ -54,7 +54,7 @@ app.get('/health', (req, res) => {
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    service: 'Georgie the Gem Miner',
+    service: 'Steve the Schedule Helper',
     version: '1.0.0',
     description: "Harvard's Q-Report Course Advisor Agent",
     agents: agentRegistry.listAgents(),
@@ -100,7 +100,7 @@ if (allErrors.length > 0) {
   console.log('  1. Create a .env file in the project root');
   console.log('  2. Add the required API keys and agent IDs');
   console.log('  3. See README.md for setup instructions\n');
-  console.log('⚠️  The server will start, but Georgie may not work!\n');
+  console.log('⚠️  The server will start, but Steve may not work!\n');
 }
 
 // Start server
@@ -109,14 +109,14 @@ const PORT = config.server.port;
 const HOST = process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
 const server = app.listen(PORT, HOST, () => {
-  console.log(`\n🚀 Georgie the Gem Miner running on http://${HOST}:${PORT}`);
+  console.log(`\n🚀 Steve the Schedule Helper running on http://${HOST}:${PORT}`);
   console.log(`   Version: 1.0.0`);
   
   // Print agent registry summary
   agentRegistry.printSummary();
   
   console.log(`Webhook Endpoints:`);
-  console.log(`  POST /webhook/gem-miner     - Georgie the Gem Miner`);
+  console.log(`  POST /webhook/gem-miner     - Steve the Schedule Helper`);
   console.log(`  GET  /health                - Health check\n`);
   console.log(`Configuration:`);
   console.log(`  Gemini API: ${config.gemini.apiKey.includes('your_') ? '❌ Not configured' : '✅ Configured'}`);
